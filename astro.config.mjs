@@ -11,6 +11,6 @@ export default defineConfig({
   site: 'https://hanna.codes',
   integrations: [
     image({serviceEntryPoint: '@astrojs/image/sharp'}),
-    sitemap(),
+    sitemap({customPages: []}),
     prefetch()]
 });
