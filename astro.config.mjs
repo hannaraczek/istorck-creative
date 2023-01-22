@@ -1,16 +1,16 @@
 import {defineConfig} from 'astro/config';
-
-// https://astro.build/config
 import netlify from '@astrojs/netlify/functions';
-
-// https://astro.build/config
 import image from '@astrojs/image';
+import sitemap from '@astrojs/sitemap';
+import prefetch from '@astrojs/prefetch';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
   adapter: netlify(),
-  integrations: [image({
-    serviceEntryPoint: '@astrojs/image/sharp'
-  })]
+  site: 'https://hanna.codes',
+  integrations: [
+    image({serviceEntryPoint: '@astrojs/image/sharp'}),
+    sitemap(),
+    prefetch()]
 });
