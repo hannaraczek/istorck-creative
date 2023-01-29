@@ -1,6 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
+import { useSanityClient, groq } from 'astro-sanity';
+
+export async function getFirstBlogPost() {
+  const query = groq`*[_type == "pet"]`;
+  const firstPost = await useSanityClient().fetch(query);
+  console.log(firstPost);
+  return firstPost;
+}
+
+
 ---
 
 <Layout title="Welcome to Astro.">
