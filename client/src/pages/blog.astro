@@ -1,3 +1,6 @@
+---
+const title = 'My Blog';
+---
 
 <html lang="en">
 	<head>
@@ -5,14 +8,19 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>About</title>
+		<title>{title}</title>
 	</head>
 	<body>
 	<a href="/">Home</a>
     <a href="/about/">About</a>
     <a href="/blog/">Blog</a>
 
-		<h1>My Astro blog</h1>
+		<h1>{title}</h1>
 		<p>I'm going to write cool things!</p>
+		 <ul>
+              <li><a href="/posts/post-1/">Post 1</a></li>
+              <li><a href="/posts/post-2/">Post 2</a></li>
+              <li><a href="/posts/post-3/">Post 3</a></li>
+            </ul>
 	</body>
 </html>
