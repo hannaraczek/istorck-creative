@@ -1,7 +1,8 @@
 import * as adapter from '@astrojs/netlify/netlify-functions.js';
 import {escape} from 'html-escaper';
+import mime from 'mime';
+import sharp from 'sharp';
 /* empty css                                 */
-import 'mime';
 import 'cookie';
 import 'kleur/colors';
 import 'string-width';
@@ -13,13 +14,11 @@ function baseCreateComponent(cb, moduleId) {
   cb.moduleId = moduleId;
   return cb;
 }
-
 function createComponentWithOptions(opts) {
   const cb = baseCreateComponent(opts.factory, opts.moduleId);
   cb.propagation = opts.propagation;
   return cb;
 }
-
 function createComponent(arg1, moduleId) {
   if (typeof arg1 === 'function') {
     return baseCreateComponent(arg1, moduleId);
@@ -35,7 +34,6 @@ function createDeprecatedFetchContentFn() {
     throw new Error('Deprecated: Astro.fetchContent() has been replaced with Astro.glob().');
   };
 }
-
 function createAstroGlobFn() {
   const globHandler = (importMetaGlobResult, globValue) => {
     let allEntries = [...Object.values(importMetaGlobResult)];
@@ -46,7 +44,6 @@ function createAstroGlobFn() {
   };
   return globHandler;
 }
-
 function createAstro(filePathname, _site, projectRootStr) {
   const site = _site ? new URL(_site) : void 0;
   const referenceURL = new URL(filePathname, `http://localhost`);
@@ -67,13 +64,11 @@ function createAstro(filePathname, _site, projectRootStr) {
 }
 
 const escapeHTML = escape;
-
 class HTMLString extends String {
   get [Symbol.toStringTag]() {
     return 'HTMLString';
   }
 }
-
 const markHTMLString = (value) => {
   if (value instanceof HTMLString) {
     return value;
@@ -83,7 +78,6 @@ const markHTMLString = (value) => {
   }
   return value;
 };
-
 function isHTMLString(value) {
   return Object.prototype.toString.call(value) === '[object HTMLString]';
 }
@@ -106,7 +100,6 @@ function determineIfNeedsHydrationScript(result) {
   }
   return result._metadata.hasHydrationScript = true;
 }
-
 const hydrationScripts = {
   idle: idle_prebuilt_default,
   load: load_prebuilt_default,
@@ -114,7 +107,6 @@ const hydrationScripts = {
   media: media_prebuilt_default,
   visible: visible_prebuilt_default
 };
-
 function determinesIfNeedsDirectiveScript(result, directive) {
   if (result._metadata.hasDirectives.has(directive)) {
     return false;
@@ -122,7 +114,6 @@ function determinesIfNeedsDirectiveScript(result, directive) {
   result._metadata.hasDirectives.add(directive);
   return true;
 }
-
 function getDirectiveScriptText(directive) {
   if (!(directive in hydrationScripts)) {
     throw new Error(`Unknown directive: ${directive}`);
@@ -130,7 +121,6 @@ function getDirectiveScriptText(directive) {
   const directiveScriptText = hydrationScripts[directive];
   return directiveScriptText;
 }
-
 function getPrescripts(type, directive) {
   switch (type) {
     case 'both':
@@ -142,7 +132,6 @@ function getPrescripts(type, directive) {
 }
 
 const headAndContentSym = Symbol.for('astro.headAndContent');
-
 function isHeadAndContent(obj) {
   return typeof obj === 'object' && !!obj[headAndContentSym];
 }
@@ -151,7 +140,6 @@ function serializeListValue(value) {
   const hash = {};
   push(value);
   return Object.keys(hash).join(' ');
-
   function push(item) {
     if (item && typeof item.forEach === 'function')
       item.forEach(push);
@@ -170,14 +158,12 @@ function serializeListValue(value) {
     }
   }
 }
-
 function isPromise(value) {
   return !!value && typeof value === 'object' && typeof value.then === 'function';
 }
 
 var _a$1;
 const renderTemplateResultSym = Symbol.for('astro.renderTemplateResult');
-
 class RenderTemplateResult {
   constructor(htmlParts, expressions) {
     this[_a$1] = true;
@@ -210,11 +196,9 @@ class RenderTemplateResult {
     }
   }
 }
-
 function isRenderTemplateResult(obj) {
   return typeof obj === 'object' && !!obj[renderTemplateResultSym];
 }
-
 async function* renderAstroTemplateResult(component) {
   for await (const value of component) {
     if (value || value === 0) {
@@ -233,7 +217,6 @@ async function* renderAstroTemplateResult(component) {
     }
   }
 }
-
 function renderTemplate(htmlParts, ...expressions) {
   return new RenderTemplateResult(htmlParts, expressions);
 }
@@ -241,7 +224,6 @@ function renderTemplate(htmlParts, ...expressions) {
 function isAstroComponentFactory(obj) {
   return obj == null ? false : obj.isAstroComponentFactory === true;
 }
-
 async function renderToString(result, componentFactory, props, children) {
   const factoryResult = await componentFactory(result, props, children);
   if (factoryResult instanceof Response) {
@@ -255,7 +237,6 @@ async function renderToString(result, componentFactory, props, children) {
   }
   return parts.toString();
 }
-
 function isAPropagatingComponent(result, factory) {
   let hint = factory.propagation || 'none';
   if (factory.moduleId && result.propagation.has(factory.moduleId) && hint === 'none') {
@@ -475,7 +456,6 @@ Expected \`true\` value but got \`${suffix}\`.`;
 function normalizeLF(code) {
   return code.replace(/\r\n|\r(?!\n)|\n/g, '\n');
 }
-
 function getErrorDataByCode(code) {
   const entry = Object.entries(AstroErrorData).find((data) => data[1].code === code);
   if (entry) {
@@ -537,31 +517,24 @@ class AstroError extends Error {
     this.hint = hint;
     this.frame = frame;
   }
-
   setErrorCode(errorCode) {
     this.errorCode = errorCode;
   }
-
   setLocation(location) {
     this.loc = location;
   }
-
   setName(name) {
     this.name = name;
   }
-
   setMessage(message) {
     this.message = message;
   }
-
   setHint(hint) {
     this.hint = hint;
   }
-
   setFrame(source, location) {
     this.frame = codeFrame(source, location);
   }
-
   static is(err) {
     return err.type === 'AstroError';
   }
@@ -580,7 +553,6 @@ const PROP_TYPE = {
   Uint16Array: 9,
   Uint32Array: 10
 };
-
 function serializeArray(value, metadata = {}, parents = /* @__PURE__ */ new WeakSet()) {
   if (parents.has(value)) {
     throw new Error(`Cyclic reference detected while serializing props for <${metadata.displayName} client:${metadata.hydrate}>!
@@ -594,7 +566,6 @@ Cyclic references cannot be safely serialized for client-side usage. Please remo
   parents.delete(value);
   return serialized;
 }
-
 function serializeObject(value, metadata = {}, parents = /* @__PURE__ */ new WeakSet()) {
   if (parents.has(value)) {
     throw new Error(`Cyclic reference detected while serializing props for <${metadata.displayName} client:${metadata.hydrate}>!
@@ -610,7 +581,6 @@ Cyclic references cannot be safely serialized for client-side usage. Please remo
   parents.delete(value);
   return serialized;
 }
-
 function convertToSerializedForm(value, metadata = {}, parents = /* @__PURE__ */ new WeakSet()) {
   const tag = Object.prototype.toString.call(value);
   switch (tag) {
@@ -659,7 +629,6 @@ function convertToSerializedForm(value, metadata = {}, parents = /* @__PURE__ */
     }
   }
 }
-
 function serializeProps(props, metadata) {
   const serialized = JSON.stringify(serializeObject(props, metadata));
   return serialized;
@@ -668,7 +637,6 @@ function serializeProps(props, metadata) {
 const HydrationDirectivesRaw = ['load', 'idle', 'media', 'visible', 'only'];
 const HydrationDirectives = new Set(HydrationDirectivesRaw);
 const HydrationDirectiveProps = new Set(HydrationDirectivesRaw.map((n) => `client:${n}`));
-
 function extractDirectives(displayName, inputProps) {
   let extracted = {
     isPage: false,
@@ -734,7 +702,6 @@ function extractDirectives(displayName, inputProps) {
   }
   return extracted;
 }
-
 async function generateHydrateScript(scriptOptions, metadata) {
   const {renderer, result, astroId, props, attrs} = scriptOptions;
   const {hydrate, componentUrl, componentExport} = metadata;
@@ -777,7 +744,6 @@ async function generateHydrateScript(scriptOptions, metadata) {
 
 var _a;
 const astroComponentInstanceSym = Symbol.for('astro.componentInstance');
-
 class AstroComponentInstance {
   constructor(result, props, slots, factory) {
     this[_a] = true;
@@ -810,9 +776,7 @@ class AstroComponentInstance {
     }
   }
 }
-
 _a = astroComponentInstanceSym;
-
 function validateComponentProps(props, displayName) {
   if (props != null) {
     for (const prop of Object.keys(props)) {
@@ -824,7 +788,6 @@ function validateComponentProps(props, displayName) {
     }
   }
 }
-
 function createAstroComponentInstance(result, displayName, factory, props, slots = {}) {
   validateComponentProps(props, displayName);
   const instance = new AstroComponentInstance(result, props, slots, factory);
@@ -833,7 +796,6 @@ function createAstroComponentInstance(result, displayName, factory, props, slots
   }
   return instance;
 }
-
 function isAstroComponentInstance(obj) {
   return typeof obj === 'object' && !!obj[astroComponentInstanceSym];
 }
@@ -869,7 +831,6 @@ async function* renderChild(child) {
 }
 
 const slotString = Symbol.for('astro:slot-string');
-
 class SlotString extends HTMLString {
   constructor(content, instructions) {
     super(content);
@@ -877,11 +838,9 @@ class SlotString extends HTMLString {
     this[slotString] = true;
   }
 }
-
 function isSlotString(str) {
   return !!str[slotString];
 }
-
 async function renderSlot(_result, slotted, fallback) {
   if (slotted) {
     let iterator = renderChild(slotted);
@@ -901,7 +860,6 @@ async function renderSlot(_result, slotted, fallback) {
   }
   return fallback;
 }
-
 async function renderSlots(result, slots = {}) {
   let slotInstructions = null;
   let children = {};
@@ -958,12 +916,10 @@ function stringifyChunk(result, chunk) {
     }
   }
 }
-
 class HTMLParts {
   constructor() {
     this.parts = '';
   }
-
   append(part, result) {
     if (ArrayBuffer.isView(part)) {
       this.parts += decoder.decode(part);
@@ -971,32 +927,26 @@ class HTMLParts {
       this.parts += stringifyChunk(result, part);
     }
   }
-
   toString() {
     return this.parts;
   }
-
   toArrayBuffer() {
     return encoder.encode(this.parts);
   }
 }
 
 const ClientOnlyPlaceholder = 'astro-client-only';
-
 class Skip {
   constructor(vnode) {
     this.vnode = vnode;
     this.count = 0;
   }
-
   increment() {
     this.count++;
   }
-
   haveNoTried() {
     return this.count === 0;
   }
-
   isCompleted() {
     return this.count > 2;
   }
@@ -1005,7 +955,6 @@ class Skip {
 Skip.symbol = Symbol('astro:jsx:skip');
 let originalConsoleError;
 let consoleFilterRefs = 0;
-
 async function renderJSX(result, vnode) {
   switch (true) {
     case vnode instanceof HTMLString:
@@ -1036,7 +985,6 @@ async function renderJSX(result, vnode) {
   }
   return renderJSXVNode(result, vnode, skip);
 }
-
 async function renderJSXVNode(result, vnode, skip) {
   if (isVNode(vnode)) {
     switch (true) {
@@ -1185,11 +1133,9 @@ function useConsoleFilter() {
     }
   }
 }
-
 function finishUsingConsoleFilter() {
   consoleFilterRefs--;
 }
-
 function filteredConsoleError(msg, ...rest) {
   if (consoleFilterRefs > 0 && typeof msg === 'string') {
     const isKnownReactHookError = msg.includes('Warning: Invalid hook call.') && msg.includes('https://reactjs.org/link/invalid-hook-call');
@@ -1231,7 +1177,6 @@ function filteredConsoleError(msg, ...rest) {
  */
 const dictionary = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY';
 const binary = dictionary.length;
-
 function bitwise(str) {
   let hash = 0;
   if (str.length === 0)
@@ -1243,7 +1188,6 @@ function bitwise(str) {
   }
   return hash;
 }
-
 function shorthash(text) {
   let num;
   let result = '';
@@ -1274,7 +1218,6 @@ const toIdent = (k) => k.trim().replace(/(?:(?!^)\b\w|\s+|[^\w]+)/g, (match, ind
 const toAttributeString = (value, shouldEscape = true) => shouldEscape ? String(value).replace(/&/g, '&#38;').replace(/"/g, '&#34;') : value;
 const kebab = (k) => k.toLowerCase() === k ? k : k.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
 const toStyleString = (obj) => Object.entries(obj).map(([k, v]) => `${kebab(k)}:${v}`).join(';');
-
 function defineScriptVars(vars) {
   let output = '';
   for (const [key, value] of Object.entries(vars)) {
@@ -1283,14 +1226,12 @@ function defineScriptVars(vars) {
   }
   return markHTMLString(output);
 }
-
 function formatList(values) {
   if (values.length === 1) {
     return values[0];
   }
   return `${values.slice(0, -1).join(', ')} or ${values[values.length - 1]}`;
 }
-
 function addAttribute(value, key, shouldEscape = true) {
   if (value == null) {
     return '';
@@ -1356,7 +1297,6 @@ function renderElement(name, {props: _props, children = ''}, shouldEscape = true
 function componentIsHTMLElement(Component) {
   return typeof HTMLElement !== 'undefined' && HTMLElement.isPrototypeOf(Component);
 }
-
 async function renderHTMLElement(result, constructor, props, slots) {
   const name = getHTMLElementName(constructor);
   let attrHTML = '';
@@ -1367,7 +1307,6 @@ async function renderHTMLElement(result, constructor, props, slots) {
       `<${name}${attrHTML}>${await renderSlot(result, slots == null ? void 0 : slots.default)}</${name}>`
   );
 }
-
 function getHTMLElementName(constructor) {
   const definedName = customElements.getName(constructor);
   if (definedName)
@@ -1377,7 +1316,6 @@ function getHTMLElementName(constructor) {
 }
 
 const rendererAliases = /* @__PURE__ */ new Map([['solid', 'solid-js']]);
-
 function guessRenderers(componentUrl) {
   const extname = componentUrl == null ? void 0 : componentUrl.split('.').pop();
   switch (extname) {
@@ -1398,15 +1336,12 @@ function guessRenderers(componentUrl) {
       ];
   }
 }
-
 function isFragmentComponent(Component) {
   return Component === Fragment;
 }
-
 function isHTMLComponent(Component) {
   return Component && typeof Component === 'object' && Component['astro:html'];
 }
-
 async function renderFrameworkComponent(result, displayName, Component, _props, slots = {}) {
   var _a, _b;
   if (!Component && !_props['client:only']) {
@@ -1615,17 +1550,14 @@ ${serializeProps(
     yield {type: 'directive', hydration, result};
     yield markHTMLString(renderElement('astro-island', island, false));
   }
-
   return renderAll();
 }
-
 function sanitizeElementName(tag) {
   const unsafe = /[&<>'"\s]+/g;
   if (!unsafe.test(tag))
     return tag;
   return tag.trim().split(unsafe)[0].trim();
 }
-
 async function renderFragmentComponent(result, slots = {}) {
   const children = await renderSlot(result, slots == null ? void 0 : slots.default);
   if (children == null) {
@@ -1633,14 +1565,12 @@ async function renderFragmentComponent(result, slots = {}) {
   }
   return markHTMLString(children);
 }
-
 async function renderHTMLComponent(result, Component, _props, slots = {}) {
   const {slotInstructions, children} = await renderSlots(result, slots);
   const html = Component.render({slots: children});
   const hydrationHtml = slotInstructions ? slotInstructions.map((instr) => stringifyChunk(result, instr)).join('') : '';
   return markHTMLString(hydrationHtml + html);
 }
-
 function renderComponent(result, displayName, Component, props, slots = {}) {
   if (isPromise(Component)) {
     return Promise.resolve(Component).then((Unwrapped) => {
@@ -1658,7 +1588,6 @@ function renderComponent(result, displayName, Component, props, slots = {}) {
   }
   return renderFrameworkComponent(result, displayName, Component, props, slots);
 }
-
 function renderComponentToIterable(result, displayName, Component, props, slots = {}) {
   const renderResult = renderComponent(result, displayName, Component, props, slots);
   if (isAstroComponentInstance(renderResult)) {
@@ -1672,14 +1601,12 @@ const uniqueElements = (item, index, all) => {
   const children = item.children;
   return index === all.findIndex((i) => JSON.stringify(i.props) === props && i.children == children);
 };
-
 async function* renderExtraHead(result, base) {
   yield base;
   for (const part of result.extraHead) {
     yield* renderChild(part);
   }
 }
-
 function renderAllHeadContent(result) {
   const styles = Array.from(result.styles).filter(uniqueElements).map((style) => renderElement('style', style));
   result.styles.clear();
@@ -1694,14 +1621,11 @@ function renderAllHeadContent(result) {
     return baseHeadContent;
   }
 }
-
 function createRenderHead(result) {
   result._metadata.hasRenderedHead = true;
   return renderAllHeadContent.bind(null, result);
 }
-
 const renderHead = createRenderHead;
-
 async function* maybeRenderHead(result) {
   if (result._metadata.hasRenderedHead) {
     return;
@@ -1771,7 +1695,6 @@ function transformSlots(vnode) {
   }
   Object.assign(vnode.props, slots);
 }
-
 function markRawChildren(child) {
   if (typeof child === 'string')
     return markHTMLString(child);
@@ -1779,7 +1702,6 @@ function markRawChildren(child) {
     return child.map((c) => markRawChildren(c));
   return child;
 }
-
 function transformSetDirectives(vnode) {
   if (!('set:html' in vnode.props || 'set:text' in vnode.props))
     return;
@@ -1796,7 +1718,6 @@ function transformSetDirectives(vnode) {
 
   }
 }
-
 function createVNode(type, props) {
   const vnode = {
     [Renderer]: 'astro:jsx',
@@ -1843,7 +1764,205 @@ var server_default = {
   renderToStaticMarkup
 };
 
-const $$Astro$2 = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/layouts/Layout.astro', '', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
+function isOutputFormat(value) {
+  return ['avif', 'jpeg', 'jpg', 'png', 'webp'].includes(value);
+}
+
+function isOutputFormatSupportsAlpha(value) {
+  return ['avif', 'png', 'webp'].includes(value);
+}
+
+function isAspectRatioString(value) {
+  return /^\d*:\d*$/.test(value);
+}
+
+class BaseSSRService {
+  async getImageAttributes(transform) {
+    const {width, height, src, format, quality, aspectRatio, ...rest} = transform;
+    return {
+      ...rest,
+      width,
+      height
+    };
+  }
+
+  serializeTransform(transform) {
+    const searchParams = new URLSearchParams();
+    if (transform.quality) {
+      searchParams.append('q', transform.quality.toString());
+    }
+    if (transform.format) {
+      searchParams.append('f', transform.format);
+    }
+    if (transform.width) {
+      searchParams.append('w', transform.width.toString());
+    }
+    if (transform.height) {
+      searchParams.append('h', transform.height.toString());
+    }
+    if (transform.aspectRatio) {
+      searchParams.append('ar', transform.aspectRatio.toString());
+    }
+    if (transform.fit) {
+      searchParams.append('fit', transform.fit);
+    }
+    if (transform.background) {
+      searchParams.append('bg', transform.background);
+    }
+    if (transform.position) {
+      searchParams.append('p', encodeURI(transform.position));
+    }
+    searchParams.append('href', transform.src);
+    return {searchParams};
+  }
+
+  parseTransform(searchParams) {
+    if (!searchParams.has('href')) {
+      return void 0;
+    }
+    let transform = {src: searchParams.get('href')};
+    if (searchParams.has('q')) {
+      transform.quality = parseInt(searchParams.get('q'));
+    }
+    if (searchParams.has('f')) {
+      const format = searchParams.get('f');
+      if (isOutputFormat(format)) {
+        transform.format = format;
+      }
+    }
+    if (searchParams.has('w')) {
+      transform.width = parseInt(searchParams.get('w'));
+    }
+    if (searchParams.has('h')) {
+      transform.height = parseInt(searchParams.get('h'));
+    }
+    if (searchParams.has('ar')) {
+      const ratio = searchParams.get('ar');
+      if (isAspectRatioString(ratio)) {
+        transform.aspectRatio = ratio;
+      } else {
+        transform.aspectRatio = parseFloat(ratio);
+      }
+    }
+    if (searchParams.has('fit')) {
+      transform.fit = searchParams.get('fit');
+    }
+    if (searchParams.has('p')) {
+      transform.position = decodeURI(searchParams.get('p'));
+    }
+    if (searchParams.has('bg')) {
+      transform.background = searchParams.get('bg');
+    }
+    return transform;
+  }
+}
+
+class SharpService extends BaseSSRService {
+  async transform(inputBuffer, transform) {
+    const sharpImage = sharp(inputBuffer, {failOnError: false, pages: -1});
+    sharpImage.rotate();
+    if (transform.width || transform.height) {
+      const width = transform.width && Math.round(transform.width);
+      const height = transform.height && Math.round(transform.height);
+      sharpImage.resize({
+        width,
+        height,
+        fit: transform.fit,
+        position: transform.position,
+        background: transform.background
+      });
+    }
+    if (transform.format) {
+      sharpImage.toFormat(transform.format, {quality: transform.quality});
+      if (transform.background && !isOutputFormatSupportsAlpha(transform.format)) {
+        sharpImage.flatten({background: transform.background});
+      }
+    }
+    const {data, info} = await sharpImage.toBuffer({resolveWithObject: true});
+    return {
+      data,
+      format: info.format
+    };
+  }
+}
+
+const service = new SharpService();
+var sharp_default = service;
+
+const fnv1a52 = (str) => {
+  const len = str.length;
+  let i = 0, t0 = 0, v0 = 8997, t1 = 0, v1 = 33826, t2 = 0, v2 = 40164, t3 = 0, v3 = 52210;
+  while (i < len) {
+    v0 ^= str.charCodeAt(i++);
+    t0 = v0 * 435;
+    t1 = v1 * 435;
+    t2 = v2 * 435;
+    t3 = v3 * 435;
+    t2 += v0 << 8;
+    t3 += v1 << 8;
+    t1 += t0 >>> 16;
+    v0 = t0 & 65535;
+    t2 += t1 >>> 16;
+    v1 = t1 & 65535;
+    v3 = t3 + (t2 >>> 16) & 65535;
+    v2 = t2 & 65535;
+  }
+  return (v3 & 15) * 281474976710656 + v2 * 4294967296 + v1 * 65536 + (v0 ^ v3 >> 4);
+};
+const etag = (payload, weak = false) => {
+  const prefix = weak ? 'W/"' : '"';
+  return prefix + fnv1a52(payload).toString(36) + payload.length.toString(36) + '"';
+};
+
+function isRemoteImage(src) {
+  return /^(https?:)?\/\//.test(src);
+}
+
+async function loadRemoteImage(src) {
+  try {
+    const res = await fetch(src);
+    if (!res.ok) {
+      return void 0;
+    }
+    return Buffer.from(await res.arrayBuffer());
+  } catch (err) {
+    console.error(err);
+    return void 0;
+  }
+}
+
+const get = async ({request}) => {
+  try {
+    const url = new URL(request.url);
+    const transform = sharp_default.parseTransform(url.searchParams);
+    let inputBuffer = void 0;
+    const sourceUrl = isRemoteImage(transform.src) ? new URL(transform.src) : new URL(transform.src, url.origin);
+    inputBuffer = await loadRemoteImage(sourceUrl);
+    if (!inputBuffer) {
+      return new Response('Not Found', {status: 404});
+    }
+    const {data, format} = await sharp_default.transform(inputBuffer, transform);
+    return new Response(data, {
+      status: 200,
+      headers: {
+        'Content-Type': mime.getType(format) || '',
+        'Cache-Control': 'public, max-age=31536000',
+        ETag: etag(data.toString()),
+        Date: new Date().toUTCString()
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return new Response(`Server Error: ${err}`, {status: 500});
+  }
+};
+
+const _page0 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  get
+}, Symbol.toStringTag, {value: 'Module'}));
+
+const $$Astro$2 = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/layouts/Layout.astro', 'https://hanna.codes/', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
 const $$Layout = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$2, $$props, $$slots);
   Astro2.self = $$Layout;
@@ -1862,7 +1981,7 @@ const $$Layout = createComponent(async ($$result, $$props, $$slots) => {
 </body></html>`;
 }, 'C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/layouts/Layout.astro');
 
-const $$Astro$1 = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/components/Card.astro', '', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
+const $$Astro$1 = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/components/Card.astro', 'https://hanna.codes/', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
 const $$Card = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro$1, $$props, $$slots);
   Astro2.self = $$Card;
@@ -1881,44 +2000,44 @@ const $$Card = createComponent(async ($$result, $$props, $$slots) => {
 `;
 }, 'C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/components/Card.astro');
 
-const $$Astro = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/pages/index.astro', '', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
+const $$Astro = createAstro('C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/pages/index.astro', 'https://hanna.codes/', 'file:///C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/');
 const $$Index = createComponent(async ($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Index;
   return renderTemplate`${renderComponent($$result, 'Layout', $$Layout, {
     'title': 'Welcome to Astro.',
-    'class': 'astro-XPXOE5E7'
+    'class': 'astro-IKKS2IFF'
   }, {
-    'default': () => renderTemplate`${maybeRenderHead($$result)}<main class="astro-XPXOE5E7">
-		<h1 class="astro-XPXOE5E7">Welcome to <span class="text-gradient astro-XPXOE5E7">Astro</span></h1>
-		<p class="instructions astro-XPXOE5E7">
-			To get started, open the directory <code class="astro-XPXOE5E7">src/pages</code> in your project.<br class="astro-XPXOE5E7">
-			<strong class="astro-XPXOE5E7">Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
+    'default': () => renderTemplate`${maybeRenderHead($$result)}<main class="astro-IKKS2IFF">
+		<h1 class="astro-IKKS2IFF">Hello! Welcome to <span class="text-gradient astro-IKKS2IFF">Astro</span></h1>
+		<p class="instructions astro-IKKS2IFF">
+			To get started, open the directory <code class="astro-IKKS2IFF">src/pages</code> in your project.<br class="astro-IKKS2IFF">
+			<strong class="astro-IKKS2IFF">Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
 		</p>
-		<ul role="list" class="link-card-grid astro-XPXOE5E7">
+		<ul role="list" class="link-card-grid astro-IKKS2IFF">
 			${renderComponent($$result, 'Card', $$Card, {
       'href': 'https://docs.astro.build/',
       'title': 'Documentation',
       'body': 'Learn how Astro works and explore the official API docs.',
-      'class': 'astro-XPXOE5E7'
+      'class': 'astro-IKKS2IFF'
     })}
 			${renderComponent($$result, 'Card', $$Card, {
       'href': 'https://astro.build/integrations/',
       'title': 'Integrations',
       'body': 'Supercharge your project with new frameworks and libraries.',
-      'class': 'astro-XPXOE5E7'
+      'class': 'astro-IKKS2IFF'
     })}
 			${renderComponent($$result, 'Card', $$Card, {
       'href': 'https://astro.build/themes/',
       'title': 'Themes',
       'body': 'Explore a galaxy of community-built starter themes.',
-      'class': 'astro-XPXOE5E7'
+      'class': 'astro-IKKS2IFF'
     })}
 			${renderComponent($$result, 'Card', $$Card, {
       'href': 'https://astro.build/chat/',
       'title': 'Community',
       'body': 'Come say hi to our amazing Discord community. \u2764\uFE0F',
-      'class': 'astro-XPXOE5E7'
+      'class': 'astro-IKKS2IFF'
     })}
 		</ul>
 	</main>`
@@ -1930,14 +2049,14 @@ const $$Index = createComponent(async ($$result, $$props, $$slots) => {
 const $$file = 'C:/Users/hraczek/Documents/Projects/Portfolios/istorck-creative/src/pages/index.astro';
 const $$url = '';
 
-const _page0 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+const _page1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
   default: $$Index,
   file: $$file,
   url: $$url
 }, Symbol.toStringTag, {value: 'Module'}));
 
-const pageMap = new Map([['src/pages/index.astro', _page0]]);
+const pageMap = new Map([['node_modules/@astrojs/image/dist/endpoint.js', _page0], ['src/pages/index.astro', _page1]]);
 const renderers = [Object.assign({
   'name': 'astro:jsx',
   'serverEntrypoint': 'astro/jsx/server.js',
@@ -2022,8 +2141,22 @@ const _manifest = Object.assign(deserializeManifest({
   'adapterName': '@astrojs/netlify/functions',
   'routes': [{
     'file': '',
-    'links': ['assets/index.80bd11b2.css'],
-    'scripts': [],
+    'links': [],
+    'scripts': [{'type': 'external', 'value': 'page.5a6f3db5.js'}],
+    'routeData': {
+      'type': 'endpoint',
+      'route': '/_image',
+      'pattern': '^\\/_image$',
+      'segments': [[{'content': '_image', 'dynamic': false, 'spread': false}]],
+      'params': [],
+      'component': 'node_modules/@astrojs/image/dist/endpoint.js',
+      'pathname': '/_image',
+      '_meta': {'trailingSlash': 'ignore'}
+    }
+  }, {
+    'file': '',
+    'links': ['assets/index.0faeddee.css'],
+    'scripts': [{'type': 'external', 'value': 'page.5a6f3db5.js'}],
     'routeData': {
       'route': '/',
       'type': 'page',
@@ -2035,6 +2168,7 @@ const _manifest = Object.assign(deserializeManifest({
       '_meta': {'trailingSlash': 'ignore'}
     }
   }],
+  'site': 'https://hanna.codes/',
   'base': '/',
   'markdown': {
     'drafts': false,
@@ -2050,8 +2184,12 @@ const _manifest = Object.assign(deserializeManifest({
   },
   'pageMap': null,
   'renderers': [],
-  'entryModules': {'\u0000@astrojs-ssr-virtual-entry': 'entry.mjs', 'astro:scripts/before-hydration.js': ''},
-  'assets': ['/assets/index.80bd11b2.css', '/favicon.svg']
+  'entryModules': {
+    '\u0000@astrojs-ssr-virtual-entry': 'entry.mjs',
+    'astro:scripts/page.js': 'page.5a6f3db5.js',
+    'astro:scripts/before-hydration.js': ''
+  },
+  'assets': ['/assets/index.0faeddee.css', '/favicon.svg', '/page.5a6f3db5.js', '/page.5a6f3db5.js']
 }), {
   pageMap: pageMap,
   renderers: renderers
